@@ -1,0 +1,54 @@
+import numpy as np
+
+# Define constants and parameters
+hbar = 1.0  # Planck's constant
+m = 1.0     # Mass of the particle
+A1 = 1.0    # Normalization constant for Psi_1
+A2 = 1.0    # Normalization constant for Psi_2
+k1 = 1.0    # Wave number for Psi_1
+k2 = 2.0    # Wave number for Psi_2
+V01 = 0.0   # Potential height for System 1
+V02 = 0.0   # Potential height for System 2
+x = 0.0     # Position
+
+# Define function F(Delta)
+def F(Delta):
+    return (hbar**2 * k1**2 * A1 / (2 * m)) * np.sin(k1 * x) - (hbar**2 * k2**2 * A2 / (2 * m)) * np.sin(k2 * x + Delta)
+
+# Define function F'(Delta)
+def F_prime(Delta, x):
+    return - (hbar**2 * A1 * k1**3 / (2 * m)) * np.sin(k1 * x) + (hbar**2 * A2 * k2**3 / (2 * m)) * np.sin(k2 * x)
+
+def find_root(initial_guess, tolerance=1e-6, max_iterations=10000):
+    delta_n = initial_guess
+    
+    for i in range(max_iterations):
+        # Evaluate the function and its derivative at the current guess
+        F_value = F(delta_n)
+        F_prime_value = F_prime(delta_n, x)
+        
+        # Check if the derivative is close to zero (to avoid division by zero)
+        if abs(F_prime_value) < 1e-10:
+            print("Derivative is close to zero. Exiting iteration.")
+            break
+        
+        # Update the guess for the root using the Newton-Raphson formula
+        delta_n_plus_1 = delta_n - F_value / F_prime_value
+        
+        # Check for convergence
+        if abs(delta_n_plus_1 - delta_n) < tolerance:
+            print("Convergence reached after", i+1, "iterations.")
+            return delta_n_plus_1
+        
+        # Update the current guess for the root
+        delta_n = delta_n_plus_1
+    
+    print("Maximum iterations reached. Solution may not have converged.")
+    return delta_n
+
+# Initial guess for the root
+initial_guess = 0.5
+
+# Find the root using the Newton-Raphson method
+root = find_root(initial_guess)
+print("Root found:", root)
